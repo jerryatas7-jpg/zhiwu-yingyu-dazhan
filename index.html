@@ -1,0 +1,724 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="light dark" />
+    <link rel="icon" href="data:," />
+    <title>植物大战僵尸英语游戏</title>
+<style>
+      button, [role="button"] { min-height: 2.25rem; }
+      * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+      :root{
+        --bg:#dff3ff;
+        --bg2:#bfe8c8;
+        --panel:#fff8e3;
+        --panel-edge:#e8c97a;
+        --ink:#2d3a1e;
+        --ink-soft:#5a6b45;
+        --card:#ffffff;
+        --lawn-a:#69c53d;
+        --lawn-b:#57b32e;
+        --dirt:#a9743f;
+        --sun:#ffb703;
+        --accent:#ff7b2f;
+        --accent-dark:#e85d04;
+        --good:#2fbf71;
+        --bad:#ef476f;
+        --zombie:#7a8b6f;
+        --shadow:0 6px 0 rgba(60,40,0,.18);
+        color-scheme: light;
+      }
+      @media (prefers-color-scheme: dark){
+        :root{
+          --bg:#12241a;
+          --bg2:#0d1a24;
+          --panel:#2c2a1e;
+          --panel-edge:#6b5a2e;
+          --ink:#f2eed8;
+          --ink-soft:#c9c4a4;
+          --card:#22301f;
+          color-scheme: dark;
+        }
+      }
+      html,body{ margin:0; padding:0; }
+      body{
+        font-family:"PingFang SC","Microsoft YaHei","Noto Sans SC",sans-serif;
+        background:linear-gradient(180deg,var(--bg) 0%,var(--bg2) 100%);
+        color:var(--ink);
+        min-height:100vh;
+      }
+      .en{ font-family:"Baloo 2","PingFang SC",sans-serif; letter-spacing:.02em; }
+      .fun{ font-family:"ZCOOL KuaiLe","PingFang SC",sans-serif; }
+      button{ font-family:inherit; cursor:pointer; border:none; background:none; color:inherit; }
+      button:focus-visible{ outline:3px solid var(--accent); outline-offset:2px; }
+      .wrap{ max-width:980px; margin:0 auto; padding:14px 14px 40px; }
+
+      /* ---------- 首页 / 选关 ---------- */
+      .hero{ text-align:center; padding:18px 6px 6px; }
+      .hero .cast{ font-size:clamp(2.4rem,8vw,3.6rem); line-height:1.1; }
+      .hero h1{ font-family:"ZCOOL KuaiLe","PingFang SC",sans-serif; font-weight:400;
+        font-size:clamp(1.9rem,6.5vw,3rem); margin:.25em 0 .1em; color:var(--ink); }
+      .hero h1 .en{ color:var(--accent-dark); }
+      .hero p{ margin:.3em auto; max-width:34em; color:var(--ink-soft); font-size:1.02rem; line-height:1.6; }
+      .howto{ display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin:16px 0 6px; }
+      .howto .step{ background:var(--card); border-radius:16px; padding:10px 14px; box-shadow:var(--shadow);
+        display:flex; align-items:center; gap:9px; font-size:.98rem; font-weight:600; max-width:300px; text-align:left; }
+      .howto .num{ flex:0 0 auto; width:30px; height:30px; border-radius:50%; background:var(--sun); color:#5b3a00;
+        display:flex; align-items:center; justify-content:center; font-family:"Baloo 2"; font-weight:800; }
+      .levels{ display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:14px; margin-top:18px; }
+      .level-card{ background:var(--card); border-radius:22px; padding:18px 16px 16px; text-align:left;
+        box-shadow:var(--shadow); border:3px solid transparent; width:100%; transition:transform .12s ease; }
+      .level-card:active{ transform:scale(.97); }
+      .level-card .big{ font-size:2.6rem; line-height:1; }
+      .level-card h2{ font-family:"ZCOOL KuaiLe","PingFang SC",sans-serif; font-weight:400; font-size:1.45rem; margin:.35em 0 .15em; }
+      .level-card .words{ color:var(--ink-soft); font-size:.92rem; line-height:1.55; min-height:2.8em; }
+      .level-card .meta{ display:flex; justify-content:space-between; align-items:center; margin-top:10px; }
+      .level-card .goal{ font-size:.9rem; font-weight:700; color:var(--accent-dark); }
+      .level-card .go{ background:var(--accent); color:#fff; font-weight:800; font-size:1rem;
+        padding:9px 18px; border-radius:999px; box-shadow:0 4px 0 var(--accent-dark); }
+      .level-card .stars{ color:var(--sun); font-size:1rem; letter-spacing:.15em; }
+      .foot-note{ text-align:center; color:var(--ink-soft); font-size:.88rem; margin-top:20px; line-height:1.6; }
+
+      /* ---------- 游戏界面 ---------- */
+      .hidden{ display:none !important; }
+      .hud{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:10px; }
+      .hud .pill{ background:var(--panel); border:2px solid var(--panel-edge); border-radius:999px;
+        padding:6px 14px; font-weight:800; font-size:1rem; display:inline-flex; align-items:center; gap:6px; }
+      .hud .pill .en{ font-size:1.05rem; }
+      .hud .spacer{ flex:1; }
+      .icon-btn{ background:var(--panel); border:2px solid var(--panel-edge); border-radius:999px;
+        min-width:44px; min-height:44px; padding:6px 14px; font-weight:800; font-size:.98rem;
+        display:inline-flex; align-items:center; justify-content:center; gap:6px; }
+      .hearts{ font-size:1.15rem; letter-spacing:.1em; }
+
+      .lawn-frame{ position:relative; border-radius:20px; overflow:hidden;
+        border:4px solid #7c4a21; box-shadow:var(--shadow); background:var(--lawn-a); }
+      .lawn{ position:relative; height:clamp(230px,42vw,330px);
+        background:
+          repeating-conic-gradient(var(--lawn-a) 0% 25%, var(--lawn-b) 0% 50%) 0 0/ 12.5% 33.34%;
+      }
+      .house{ position:absolute; left:0; top:0; bottom:0; width:7%; min-width:34px; z-index:3;
+        background:linear-gradient(180deg,#f4a261,#e76f51); border-right:4px solid #7c4a21;
+        display:flex; align-items:center; justify-content:center; font-size:clamp(1.2rem,4vw,1.8rem); }
+      .fence{ position:absolute; right:0; top:0; bottom:0; width:5%; min-width:22px; z-index:1;
+        background:repeating-linear-gradient(180deg,#f1dcb2 0 14px,#d9b878 14px 18px); border-left:3px solid #b98d4f; }
+      .lane-line{ position:absolute; left:0; right:0; height:2px; background:rgba(60,90,20,.25); z-index:0; }
+      .plant{ position:absolute; z-index:2; transform:translate(-50%,-50%); text-align:center; pointer-events:none;
+        animation:bob 1.6s ease-in-out infinite; }
+      .plant .face{ font-size:clamp(1.9rem,6vw,2.7rem); line-height:1; filter:drop-shadow(0 3px 2px rgba(0,0,0,.25)); }
+      .plant .soil{ width:70%; height:9px; margin:1px auto 0; background:radial-gradient(ellipse at center,#7c4a21 55%,transparent 72%); border-radius:50%; }
+      .plant.pop{ animation:pop .35s ease-out; }
+      @keyframes bob{ 0%,100%{ margin-top:0 } 50%{ margin-top:-4px } }
+      @keyframes pop{ 0%{ transform:translate(-50%,-50%) scale(.2) } 70%{ transform:translate(-50%,-50%) scale(1.25) } 100%{ transform:translate(-50%,-50%) scale(1) } }
+      .zombie{ position:absolute; z-index:4; transform:translate(-50%,-50%); text-align:center; pointer-events:none;
+        transition:left 0.9s linear; }
+      .zombie .face{ font-size:clamp(2.6rem,9vw,3.8rem); line-height:1; filter:drop-shadow(0 4px 3px rgba(0,0,0,.3));
+        animation:wobble 1s ease-in-out infinite; display:block; }
+      .zombie .hpbar{ width:64px; height:10px; margin:4px auto 0; background:rgba(0,0,0,.35); border-radius:99px; overflow:hidden; }
+      .zombie .hpfill{ height:100%; background:linear-gradient(90deg,#ef476f,#ff9f1c); border-radius:99px; transition:width .3s ease; }
+      .zombie .zname{ font-size:.78rem; font-weight:800; background:rgba(0,0,0,.45); color:#fff; border-radius:99px; padding:1px 8px; }
+      .zombie.hit .face{ animation:shake .3s ease; }
+      .zombie.dead{ transition:all .6s ease; transform:translate(-50%,-30%) rotate(80deg); opacity:0; }
+      @keyframes wobble{ 0%,100%{ transform:rotate(-4deg) } 50%{ transform:rotate(4deg) translateY(-3px) } }
+      @keyframes shake{ 0%,100%{ transform:translateX(0) } 25%{ transform:translateX(-7px) } 75%{ transform:translateX(7px) } }
+      .pea{ position:absolute; z-index:3; width:16px; height:16px; border-radius:50%;
+        background:radial-gradient(circle at 35% 35%,#d8ffb0,#58b32e 70%); box-shadow:0 2px 3px rgba(0,0,0,.25);
+        transform:translate(-50%,-50%); pointer-events:none; }
+      .sunfly{ position:absolute; z-index:6; font-size:1.5rem; pointer-events:none; transition:all .7s ease-in; }
+      .progress-row{ display:flex; align-items:center; gap:10px; background:#7c4a21; color:#ffe9bd;
+        padding:7px 14px; font-weight:800; font-size:.95rem; }
+      .progress-track{ flex:1; height:12px; background:rgba(0,0,0,.35); border-radius:99px; overflow:hidden; }
+      .progress-fill{ height:100%; width:0%; background:linear-gradient(90deg,#ffb703,#ff7b2f); border-radius:99px; transition:width .4s ease; }
+
+      /* ---------- 答题区 ---------- */
+      .quiz{ margin-top:12px; background:var(--panel); border:3px solid var(--panel-edge); border-radius:22px;
+        padding:16px 16px 18px; box-shadow:var(--shadow); }
+      .quiz-top{ display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
+      .quiz-pic{ font-size:clamp(3rem,10vw,4.2rem); line-height:1; background:var(--card); border-radius:18px;
+        padding:8px 12px; box-shadow:inset 0 0 0 2px var(--panel-edge); cursor:pointer; }
+      .quiz-word{ flex:1; min-width:170px; }
+      .quiz-word .zh{ font-family:"ZCOOL KuaiLe","PingFang SC",sans-serif; font-size:clamp(1.5rem,5vw,2rem); }
+      .quiz-word .ipa{ color:var(--ink-soft); font-size:1rem; margin-top:2px; }
+      .quiz-word .ipa .en{ font-weight:700; }
+      .speak-btn{ background:var(--sun); color:#5b3a00; font-weight:800; font-size:1.02rem; border-radius:999px;
+        padding:12px 20px; box-shadow:0 4px 0 #d18d00; min-height:52px; }
+      .speak-btn:active{ transform:translateY(2px); box-shadow:0 2px 0 #d18d00; }
+      .combo{ font-weight:800; color:var(--accent-dark); font-size:1rem; min-height:1.4em; }
+      .slots{ display:flex; gap:8px; flex-wrap:wrap; margin:16px 0 6px; align-items:flex-end; }
+      .slot{ min-width:58px; height:62px; padding:0 12px; border-radius:14px; background:var(--card);
+        border:3px dashed var(--panel-edge); display:flex; align-items:center; justify-content:center;
+        font-family:"Baloo 2"; font-weight:800; font-size:1.7rem; color:var(--ink); }
+      .slot.filled{ border-style:solid; border-color:var(--good); background:#e9fbeF; background:#e9fbef; }
+      .slot.filled.pop{ animation:slotpop .25s ease; }
+      @keyframes slotpop{ 0%{ transform:scale(.7) } 100%{ transform:scale(1) } }
+      .slot-hint{ font-size:.92rem; color:var(--ink-soft); margin-bottom:4px; }
+      .tiles{ display:flex; gap:10px; flex-wrap:wrap; margin-top:10px; }
+      .tile{ font-family:"Baloo 2"; font-weight:800; font-size:1.55rem; color:#20503c;
+        background:linear-gradient(180deg,#eaffd9,#c9f2ae); border:3px solid #58b32e; border-radius:16px;
+        min-width:66px; min-height:60px; padding:8px 16px; box-shadow:0 5px 0 #3e8f1f; }
+      .tile:active{ transform:translateY(3px); box-shadow:0 2px 0 #3e8f1f; }
+      .tile.used{ visibility:hidden; }
+      .tile.wrong{ animation:shake .3s ease; background:linear-gradient(180deg,#ffe0e8,#ffc2d1); border-color:var(--bad); box-shadow:0 5px 0 #c9184a; }
+      .tile.glow{ animation:glow 0.9s ease-in-out infinite; }
+      @keyframes glow{ 0%,100%{ box-shadow:0 5px 0 #3e8f1f, 0 0 0 0 rgba(255,183,3,.0) } 50%{ box-shadow:0 5px 0 #3e8f1f, 0 0 0 7px rgba(255,183,3,.55) } }
+      .feedback{ min-height:1.7em; font-size:1.12rem; font-weight:800; margin-top:10px; }
+      .feedback.good{ color:#1d9e57; }
+      .feedback.bad{ color:#d6336c; }
+
+      /* ---------- 结算 ---------- */
+      .result{ text-align:center; padding:26px 10px; }
+      .result .big{ font-size:4rem; }
+      .result h2{ font-family:"ZCOOL KuaiLe","PingFang SC",sans-serif; font-weight:400; font-size:2rem; margin:.3em 0 .2em; }
+      .result .stars-big{ font-size:2.2rem; letter-spacing:.2em; color:var(--sun); text-shadow:0 2px 0 #d18d00; }
+      .result p{ color:var(--ink-soft); line-height:1.7; }
+      .learned{ display:flex; flex-wrap:wrap; gap:9px; justify-content:center; margin:16px auto; max-width:640px; }
+      .word-chip{ background:var(--card); border:2px solid var(--panel-edge); border-radius:14px; padding:8px 13px;
+        font-size:1rem; font-weight:700; display:inline-flex; gap:7px; align-items:center; min-height:48px; }
+      .word-chip .en{ font-size:1.1rem; }
+      .btn-row{ display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-top:18px; }
+      .btn-main{ background:var(--accent); color:#fff; font-weight:800; font-size:1.08rem; border-radius:999px;
+        padding:13px 26px; box-shadow:0 5px 0 var(--accent-dark); min-height:54px; }
+      .btn-main:active{ transform:translateY(3px); box-shadow:0 2px 0 var(--accent-dark); }
+      .btn-soft{ background:var(--panel); border:2px solid var(--panel-edge); color:var(--ink); font-weight:800;
+        font-size:1.02rem; border-radius:999px; padding:12px 22px; min-height:54px; }
+      .flash-red{ animation:flashred .5s ease; }
+      @keyframes flashred{ 0%{ box-shadow:inset 0 0 0 6px rgba(239,71,111,.9) } 100%{ box-shadow:inset 0 0 0 0 rgba(239,71,111,0) } }
+      @media (prefers-reduced-motion: reduce){
+        .plant,.zombie .face{ animation:none; }
+        .zombie{ transition:none; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+
+      <!-- 选关首页 -->
+      <section id="screen-home">
+        <div class="hero">
+          <div class="cast" aria-hidden="true">🌻 🫛 🧟 🌶️</div>
+          <h1>植物大战僵尸 · <span class="en">英语大作战</span></h1>
+          <p>看中文、拼英文，拼对一个单词就召唤一棵植物打僵尸！<br />打败所有糊涂怪，保护我们的小房子 🏠</p>
+        </div>
+        <div class="howto">
+          <div class="step"><span class="num">1</span><span>看图片和中文，点 🔊 听一听英语怎么读</span></div>
+          <div class="step"><span class="num">2</span><span>按顺序点下面的字母块，把单词拼出来</span></div>
+          <div class="step"><span class="num">3</span><span>拼对啦！植物出现，砰砰打僵尸</span></div>
+        </div>
+        <div class="levels" id="level-list"></div>
+        <p class="foot-note">适合幼儿园到小学低年级 · 全部可以点触操作 · 点单词卡片可以听发音</p>
+      </section>
+
+      <!-- 游戏界面 -->
+      <section id="screen-game" class="hidden">
+        <div class="hud">
+          <button class="icon-btn" id="btn-back" aria-label="返回选关">⬅ 返回</button>
+          <span class="pill" id="hud-level">第 1 关</span>
+          <span class="pill">☀️ <span class="en" id="hud-sun">0</span></span>
+          <span class="pill">⏱️ <span class="en" id="hud-time">0:00</span></span>
+          <span class="spacer"></span>
+          <span class="pill hearts" id="hud-hearts" aria-label="小房子生命">❤️❤️❤️</span>
+          <button class="icon-btn" id="btn-sound" aria-label="开关音效">🔊 音效</button>
+        </div>
+
+        <div class="lawn-frame" id="lawn-frame">
+          <div class="lawn" id="lawn">
+            <div class="house" aria-hidden="true">🏠</div>
+            <div class="fence" aria-hidden="true"></div>
+          </div>
+          <div class="progress-row">
+            <span>🧟 糊涂怪</span>
+            <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+            <span class="en" id="progress-text">0/4</span>
+          </div>
+        </div>
+
+        <div class="quiz" id="quiz">
+          <div class="quiz-top">
+            <div class="quiz-pic" id="quiz-pic" aria-hidden="true">🍎</div>
+            <div class="quiz-word">
+              <div class="zh" id="quiz-zh">苹果</div>
+              <div class="ipa">音标 <span class="en" id="quiz-ipa">/ˈæp.əl/</span></div>
+              <div class="combo" id="combo"></div>
+            </div>
+            <button class="speak-btn" id="btn-speak">🔊 听发音</button>
+          </div>
+          <div class="slots" id="slots" aria-label="单词拼写区"></div>
+          <div class="slot-hint">👆 按顺序点一点下面的字母块，把单词拼完整：</div>
+          <div class="tiles" id="tiles"></div>
+          <div class="feedback" id="feedback" role="status"></div>
+        </div>
+      </section>
+
+      <!-- 结算界面 -->
+      <section id="screen-result" class="hidden">
+        <div class="result">
+          <div class="big" id="result-emoji">🏆</div>
+          <h2 id="result-title">过关啦！</h2>
+          <div class="stars-big" id="result-stars">⭐⭐⭐</div>
+          <p id="result-desc"></p>
+          <div class="learned" id="learned"></div>
+          <div class="btn-row">
+            <button class="btn-main" id="btn-next">下一关 ➜</button>
+            <button class="btn-soft" id="btn-replay">🔁 再玩一次</button>
+            <button class="btn-soft" id="btn-home">🏠 返回选关</button>
+          </div>
+        </div>
+      </section>
+
+    </div>
+
+    <script>
+    (function(){
+      "use strict";
+
+      /* ---------------- 单词库（幼儿园 / 低年级） ---------------- */
+      var LEVELS = [
+        { name:"第 1 关 · 水果乐园", icon:"🍎", stars:"★☆☆", zombieHP:3, target:4, zombieName:"糊涂怪",
+          words:[
+            {en:"apple",  zh:"苹果", pic:"🍎", ipa:"/ˈæp.əl/",  chunks:["ap","ple"]},
+            {en:"banana", zh:"香蕉", pic:"🍌", ipa:"/bəˈnɑː.nə/", chunks:["ba","na","na"]},
+            {en:"orange", zh:"橙子", pic:"🍊", ipa:"/ˈɒr.ɪndʒ/", chunks:["or","ange"]},
+            {en:"grape",  zh:"葡萄", pic:"🍇", ipa:"/ɡreɪp/",   chunks:["gr","ape"]},
+            {en:"pear",   zh:"梨子", pic:"🍐", ipa:"/peər/",    chunks:["pe","ar"]},
+            {en:"peach",  zh:"桃子", pic:"🍑", ipa:"/piːtʃ/",   chunks:["pea","ch"]},
+            {en:"lemon",  zh:"柠檬", pic:"🍋", ipa:"/ˈlem.ən/", chunks:["le","mon"]},
+            {en:"melon",  zh:"甜瓜", pic:"🍈", ipa:"/ˈmel.ən/", chunks:["me","lon"]}
+          ]},
+        { name:"第 2 关 · 动物朋友", icon:"🐶", stars:"★☆☆", zombieHP:4, target:5, zombieName:"迷糊怪",
+          words:[
+            {en:"cat",  zh:"小猫", pic:"🐱", ipa:"/kæt/",  chunks:["c","at"]},
+            {en:"dog",  zh:"小狗", pic:"🐶", ipa:"/dɒɡ/",  chunks:["d","og"]},
+            {en:"pig",  zh:"小猪", pic:"🐷", ipa:"/pɪɡ/",  chunks:["p","ig"]},
+            {en:"duck", zh:"鸭子", pic:"🦆", ipa:"/dʌk/",  chunks:["du","ck"]},
+            {en:"fish", zh:"小鱼", pic:"🐟", ipa:"/fɪʃ/",  chunks:["fi","sh"]},
+            {en:"bird", zh:"小鸟", pic:"🐦", ipa:"/bɜːd/", chunks:["b","ird"]},
+            {en:"frog", zh:"青蛙", pic:"🐸", ipa:"/frɒɡ/", chunks:["fr","og"]},
+            {en:"bear", zh:"小熊", pic:"🐻", ipa:"/beər/", chunks:["be","ar"]}
+          ]},
+        { name:"第 3 关 · 美味食物", icon:"🍰", stars:"★★☆", zombieHP:4, target:5, zombieName:"贪吃怪",
+          words:[
+            {en:"milk",  zh:"牛奶", pic:"🥛", ipa:"/mɪlk/",     chunks:["m","ilk"]},
+            {en:"egg",   zh:"鸡蛋", pic:"🥚", ipa:"/eɡ/",       chunks:["e","gg"]},
+            {en:"cake",  zh:"蛋糕", pic:"🍰", ipa:"/keɪk/",     chunks:["ca","ke"]},
+            {en:"rice",  zh:"米饭", pic:"🍚", ipa:"/raɪs/",     chunks:["ri","ce"]},
+            {en:"bread", zh:"面包", pic:"🍞", ipa:"/bred/",     chunks:["bre","ad"]},
+            {en:"juice", zh:"果汁", pic:"🧃", ipa:"/dʒuːs/",    chunks:["jui","ce"]},
+            {en:"honey", zh:"蜂蜜", pic:"🍯", ipa:"/ˈhʌn.i/",   chunks:["ho","ney"]},
+            {en:"candy", zh:"糖果", pic:"🍬", ipa:"/ˈkæn.di/",  chunks:["can","dy"]}
+          ]},
+        { name:"第 4 关 · 彩虹颜色", icon:"🌈", stars:"★★☆", zombieHP:5, target:6, zombieName:"灰灰怪",
+          words:[
+            {en:"red",    zh:"红色", pic:"🔴", ipa:"/red/",       chunks:["r","ed"]},
+            {en:"blue",   zh:"蓝色", pic:"🔵", ipa:"/bluː/",      chunks:["bl","ue"]},
+            {en:"green",  zh:"绿色", pic:"🟢", ipa:"/ɡriːn/",     chunks:["gr","een"]},
+            {en:"pink",   zh:"粉色", pic:"🌸", ipa:"/pɪŋk/",      chunks:["pi","nk"]},
+            {en:"yellow", zh:"黄色", pic:"🟡", ipa:"/ˈjel.əʊ/",   chunks:["ye","llow"]},
+            {en:"black",  zh:"黑色", pic:"⚫", ipa:"/blæk/",      chunks:["bla","ck"]},
+            {en:"white",  zh:"白色", pic:"⚪", ipa:"/waɪt/",      chunks:["whi","te"]},
+            {en:"purple", zh:"紫色", pic:"🟣", ipa:"/ˈpɜː.pəl/",  chunks:["pur","ple"]}
+          ]},
+        { name:"第 5 关 · 拼读小达人", icon:"🔤", stars:"★★★", zombieHP:5, target:6, zombieName:"大糊涂怪",
+          words:[
+            {en:"hat", zh:"帽子", pic:"🎩", ipa:"/hæt/", chunks:["h","at"]},
+            {en:"mat", zh:"垫子", pic:"🧘", ipa:"/mæt/", chunks:["m","at"]},
+            {en:"bus", zh:"公交车", pic:"🚌", ipa:"/bʌs/", chunks:["b","us"]},
+            {en:"sun", zh:"太阳", pic:"☀️", ipa:"/sʌn/", chunks:["s","un"]},
+            {en:"cup", zh:"杯子", pic:"🥤", ipa:"/kʌp/", chunks:["c","up"]},
+            {en:"bed", zh:"小床", pic:"🛏️", ipa:"/bed/", chunks:["b","ed"]},
+            {en:"ten", zh:"数字十", pic:"🔟", ipa:"/ten/", chunks:["te","n"]},
+            {en:"box", zh:"盒子", pic:"📦", ipa:"/bɒks/", chunks:["bo","x"]}
+          ]}
+      ];
+
+      var PLANTS = [
+        {face:"🌱", name:"小苗射手", dmg:1},
+        {face:"🫛", name:"豌豆射手", dmg:2},
+        {face:"🌻", name:"向日葵",   dmg:1, sun:5},
+        {face:"🌶️", name:"辣椒炮",   dmg:3},
+        {face:"🎃", name:"南瓜卫士", dmg:1},
+        {face:"🍄", name:"蘑菇射手", dmg:2}
+      ];
+      var ZOMBIE_FACES = ["🧟","🧟‍♂️","🧟‍♀️"];
+
+      /* ---------------- 工具 ---------------- */
+      function $(id){ return document.getElementById(id); }
+      function shuffle(a){ a=a.slice(); for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
+
+      /* ---------------- 音效（WebAudio 小合成） ---------------- */
+      var audioCtx=null, soundOn=true;
+      function beep(freq, dur, type, delay){
+        if(!soundOn) return;
+        try{
+          if(!audioCtx) audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+          if(audioCtx.state==="suspended") audioCtx.resume();
+          var t = audioCtx.currentTime + (delay||0);
+          var o = audioCtx.createOscillator(), g = audioCtx.createGain();
+          o.type = type||"sine"; o.frequency.value = freq;
+          g.gain.setValueAtTime(0.18, t);
+          g.gain.exponentialRampToValueAtTime(0.001, t+dur);
+          o.connect(g); g.connect(audioCtx.destination);
+          o.start(t); o.stop(t+dur);
+        }catch(e){}
+      }
+      function sndGood(){ beep(660,.12,"sine",0); beep(880,.16,"sine",.09); }
+      function sndWord(){ beep(523,.12,"triangle",0); beep(659,.12,"triangle",.1); beep(784,.2,"triangle",.2); }
+      function sndBad(){ beep(180,.22,"sawtooth",0); }
+      function sndShoot(){ beep(980,.07,"square",0); }
+      function sndWin(){ [523,659,784,1046].forEach(function(f,i){ beep(f,.22,"triangle",i*.14); }); }
+
+      /* ---------------- 英语发音（浏览器朗读） ---------------- */
+      function speak(text){
+        try{
+          if(!("speechSynthesis" in window)) return;
+          window.speechSynthesis.cancel();
+          var u = new SpeechSynthesisUtterance(text);
+          u.lang = "en-US"; u.rate = 0.82; u.pitch = 1.1;
+          var vs = window.speechSynthesis.getVoices();
+          for(var i=0;i<vs.length;i++){ if(/^en[-_]/i.test(vs[i].lang)){ u.voice = vs[i]; break; } }
+          window.speechSynthesis.speak(u);
+        }catch(e){}
+      }
+      if("speechSynthesis" in window){ try{ window.speechSynthesis.getVoices(); }catch(e){} }
+
+      /* ---------------- 游戏状态 ---------------- */
+      var S = null;
+      var timers = [];
+
+      function clearTimers(){ timers.forEach(function(t){ clearInterval(t); clearTimeout(t); }); timers=[]; }
+      function every(ms, fn){ var t=setInterval(fn, ms); timers.push(t); return t; }
+      function later(ms, fn){ var t=setTimeout(fn, ms); timers.push(t); return t; }
+
+      function show(id){
+        ["screen-home","screen-game","screen-result"].forEach(function(s){ $(s).classList.toggle("hidden", s!==id); });
+        window.scrollTo(0,0);
+      }
+
+      /* ---------------- 选关 ---------------- */
+      function buildHome(){
+        var box = $("level-list"); box.innerHTML="";
+        LEVELS.forEach(function(lv, idx){
+          var wordsPreview = lv.words.slice(0,4).map(function(w){ return w.en+" "+w.zh; }).join(" · ")+" …";
+          var card = document.createElement("button");
+          card.className = "level-card";
+          card.setAttribute("aria-label", "开始"+lv.name);
+          card.innerHTML =
+            '<div class="big" aria-hidden="true">'+lv.icon+'</div>'+
+            '<h2>'+lv.name+'</h2>'+
+            '<div class="words en">'+wordsPreview+'</div>'+
+            '<div class="meta"><span class="goal">🧟 打败 '+lv.target+' 只'+lv.zombieName+'</span><span class="stars" aria-hidden="true">'+lv.stars+'</span></div>'+
+            '<div class="meta"><span class="words">'+lv.words.length+' 个单词</span><span class="go">开始 ▶</span></div>';
+          card.addEventListener("click", function(){ startLevel(idx); });
+          box.appendChild(card);
+        });
+      }
+
+      /* ---------------- 开局 ---------------- */
+      function startLevel(idx){
+        clearTimers();
+        var lv = LEVELS[idx];
+        S = {
+          idx: idx, lv: lv,
+          sun: 0, hearts: 3, defeated: 0, seconds: 0,
+          wordQueue: shuffle(lv.words), wordPos: 0,
+          current: null, slotPos: 0, mistakesThisWord: 0,
+          streak: 0, totalMistakes: 0, wordsDone: 0,
+          learned: [],
+          plants: [], plantCycle: 0,
+          zombie: null, over: false
+        };
+        $("hud-level").textContent = lv.name;
+        $("hud-sun").textContent = "0";
+        $("hud-time").textContent = "0:00";
+        updateHearts(); updateProgress();
+        $("lawn").querySelectorAll(".plant,.zombie,.pea,.sunfly").forEach(function(el){ el.remove(); });
+        show("screen-game");
+        spawnZombie();
+        nextWord();
+        every(1000, function(){
+          if(S.over) return;
+          S.seconds++;
+          var m = Math.floor(S.seconds/60), s = S.seconds%60;
+          $("hud-time").textContent = m+":"+(s<10?"0":"")+s;
+        });
+        /* 僵尸慢慢往前走：每 14 秒一步，给小朋友留足思考时间 */
+        every(14000, function(){ if(!S.over && S.zombie) zombieStep(); });
+        /* 植物自动射豌豆（表演动画） */
+        every(2600, function(){ if(!S.over && S.zombie && S.plants.length) shootPea(); });
+      }
+
+      function updateHearts(){
+        var h=""; for(var i=0;i<3;i++) h += (i<S.hearts ? "❤️" : "🖤");
+        $("hud-hearts").textContent = h;
+      }
+      function updateProgress(){
+        $("progress-text").textContent = S.defeated+"/"+S.lv.target;
+        $("progress-fill").style.width = Math.min(100, S.defeated/S.lv.target*100)+"%";
+      }
+
+      /* ---------------- 僵尸 ---------------- */
+      function spawnZombie(){
+        var lawn = $("lawn");
+        var lane = Math.floor(Math.random()*3);
+        var el = document.createElement("div");
+        el.className = "zombie";
+        el.innerHTML = '<span class="zname"></span><span class="face"></span><div class="hpbar"><div class="hpfill"></div></div>';
+        el.querySelector(".face").textContent = ZOMBIE_FACES[Math.floor(Math.random()*ZOMBIE_FACES.length)];
+        el.querySelector(".zname").textContent = S.lv.zombieName;
+        lawn.appendChild(el);
+        S.zombie = { el: el, lane: lane, hp: S.lv.zombieHP, maxhp: S.lv.zombieHP, pos: 92 };
+        placeZombie();
+        updateZombieHP();
+      }
+      function laneTop(lane){ return (lane*33.34 + 16.67); }
+      function placeZombie(){
+        if(!S.zombie) return;
+        S.zombie.el.style.left = S.zombie.pos + "%";
+        S.zombie.el.style.top = laneTop(S.zombie.lane) + "%";
+      }
+      function updateZombieHP(){
+        if(!S.zombie) return;
+        S.zombie.el.querySelector(".hpfill").style.width = Math.max(0, S.zombie.hp/S.zombie.maxhp*100)+"%";
+      }
+      function zombieStep(){
+        var z = S.zombie; if(!z) return;
+        z.pos -= 9;
+        /* 撞到这一行的植物：吃掉一棵，僵尸退后 */
+        var frontPlant = null;
+        S.plants.forEach(function(p){ if(p.lane===z.lane && (!frontPlant || p.col>frontPlant.col)) frontPlant=p; });
+        var plantLine = frontPlant ? (10 + frontPlant.col*11) : 10;
+        if(z.pos <= plantLine + 6){
+          if(frontPlant){
+            frontPlant.el.remove();
+            S.plants.splice(S.plants.indexOf(frontPlant),1);
+            z.pos = Math.min(92, z.pos + 22);
+            setFeedback("😱 僵尸吃掉了一棵植物！快拼单词召唤新的植物！", false);
+            sndBad();
+          } else {
+            S.hearts--; updateHearts();
+            $("lawn-frame").classList.remove("flash-red"); void $("lawn-frame").offsetWidth;
+            $("lawn-frame").classList.add("flash-red");
+            sndBad();
+            if(S.hearts<=0){ gameOver(false); return; }
+            setFeedback("🏠 僵尸碰到小房子啦！还剩 "+S.hearts+" 颗爱心，加油拼单词！", false);
+            z.pos = 92;
+          }
+        }
+        placeZombie();
+      }
+      function hitZombie(dmg){
+        var z = S.zombie; if(!z) return;
+        z.hp -= dmg; updateZombieHP();
+        z.el.classList.remove("hit"); void z.el.offsetWidth; z.el.classList.add("hit");
+        if(z.hp<=0){
+          z.el.classList.add("dead");
+          var deadEl = z.el; S.zombie = null;
+          later(650, function(){ deadEl.remove(); });
+          S.defeated++; updateProgress();
+          beep(392,.15,"triangle",0); beep(523,.2,"triangle",.12);
+          if(S.defeated >= S.lv.target){ later(800, function(){ gameOver(true); }); }
+          else later(900, function(){ if(!S.over) spawnZombie(); });
+        }
+      }
+
+      /* ---------------- 植物 ---------------- */
+      function summonPlant(){
+        var plant = PLANTS[S.plantCycle % PLANTS.length]; S.plantCycle++;
+        /* 优先种在僵尸那一行最靠前的位置 */
+        var lane = S.zombie ? S.zombie.lane : Math.floor(Math.random()*3);
+        var usedCols = S.plants.filter(function(p){ return p.lane===lane; }).map(function(p){ return p.col; });
+        var col = -1;
+        for(var c=2;c>=0;c--){ if(usedCols.indexOf(c)===-1){ col=c; break; } }
+        if(col===-1){ lane = Math.floor(Math.random()*3); col = Math.floor(Math.random()*3);
+          var occupied = S.plants.some(function(p){ return p.lane===lane && p.col===col; });
+          if(occupied){ /* 植物满了：直接变成阳光攻击 */
+            S.sun += 10; $("hud-sun").textContent = S.sun;
+            return plant;
+          }
+        }
+        var el = document.createElement("div");
+        el.className = "plant pop";
+        el.innerHTML = '<div class="face">'+plant.face+'</div><div class="soil"></div>';
+        el.style.left = (13 + col*11) + "%";
+        el.style.top = laneTop(lane) + "%";
+        $("lawn").appendChild(el);
+        S.plants.push({ el: el, lane: lane, col: col, face: plant.face });
+        if(plant.sun){ S.sun += plant.sun; }
+        return plant;
+      }
+      function shootPea(){
+        var z = S.zombie; if(!z) return;
+        var shooters = S.plants.filter(function(p){ return p.lane===z.lane; });
+        if(!shooters.length) return;
+        var p = shooters[shooters.length-1];
+        var pea = document.createElement("div");
+        pea.className = "pea";
+        pea.style.left = (16 + p.col*11) + "%";
+        pea.style.top = laneTop(p.lane) + "%";
+        $("lawn").appendChild(pea);
+        sndShoot();
+        requestAnimationFrame(function(){
+          pea.style.transition = "left .45s linear";
+          pea.style.left = z.pos + "%";
+        });
+        later(470, function(){ pea.remove(); });
+      }
+      function flySun(){
+        var s = document.createElement("div");
+        s.className = "sunfly"; s.textContent = "☀️";
+        s.style.left = "60%"; s.style.top = "30%";
+        $("lawn").appendChild(s);
+        requestAnimationFrame(function(){ s.style.left="6%"; s.style.top="2%"; s.style.opacity="0.2"; });
+        later(720, function(){ s.remove(); });
+      }
+
+      /* ---------------- 出题：拼单词 ---------------- */
+      function nextWord(){
+        if(S.over) return;
+        if(S.wordPos >= S.wordQueue.length){ S.wordQueue = shuffle(S.lv.words); S.wordPos = 0; }
+        var w = S.wordQueue[S.wordPos++];
+        S.current = w; S.slotPos = 0; S.mistakesThisWord = 0;
+        $("quiz-pic").textContent = w.pic;
+        $("quiz-zh").textContent = w.zh;
+        $("quiz-ipa").textContent = w.ipa;
+        updateCombo();
+        setFeedback("听一听，再按顺序拼出「"+w.zh+"」的英语单词吧！", true);
+        /* 空格 */
+        var slots = $("slots"); slots.innerHTML="";
+        w.chunks.forEach(function(){
+          var d = document.createElement("div"); d.className="slot"; d.textContent="·";
+          slots.appendChild(d);
+        });
+        /* 字母块：正确块 + 1~2 个干扰块 */
+        var tilesData = w.chunks.map(function(c,i){ return {text:c, correctOrder:i}; });
+        var others = shuffle(S.lv.words.filter(function(x){ return x!==w; }));
+        var distract = [];
+        for(var i=0;i<others.length && distract.length<2;i++){
+          others[i].chunks.forEach(function(c){
+            if(w.chunks.indexOf(c)===-1 && distract.indexOf(c)===-1 && distract.length<2) distract.push(c);
+          });
+        }
+        distract.forEach(function(c){ tilesData.push({text:c, correctOrder:-1}); });
+        var tiles = $("tiles"); tiles.innerHTML="";
+        shuffle(tilesData).forEach(function(td){
+          var b = document.createElement("button");
+          b.className = "tile en"; b.textContent = td.text;
+          b.setAttribute("aria-label", "字母块 "+td.text);
+          b.addEventListener("click", function(){ tapTile(b, td); });
+          tiles.appendChild(b);
+        });
+        later(350, function(){ speak(w.en); });
+      }
+
+      function updateCombo(){
+        $("combo").textContent = S.streak>=2 ? ("🔥 连对 ×"+S.streak) : "";
+      }
+
+      function tapTile(btn, td){
+        if(S.over || !S.current || btn.classList.contains("used")) return;
+        var expected = S.current.chunks[S.slotPos];
+        if(td.text === expected){
+          btn.classList.add("used");
+          var slot = $("slots").children[S.slotPos];
+          slot.textContent = td.text; slot.classList.add("filled","pop");
+          S.slotPos++;
+          beep(520 + S.slotPos*90, .1, "sine", 0);
+          if(S.slotPos >= S.current.chunks.length){ wordComplete(); }
+          else setFeedback("对啦！继续拼下一个 👇", true);
+        } else {
+          S.mistakesThisWord++; S.totalMistakes++;
+          btn.classList.remove("wrong"); void btn.offsetWidth; btn.classList.add("wrong");
+          sndBad();
+          if(S.zombie) zombieStep();
+          if(S.mistakesThisWord >= 2){
+            /* 给小朋友一个提示：正确的字母块会发光 */
+            var tiles = $("tiles").querySelectorAll(".tile:not(.used)");
+            tiles.forEach(function(t){ if(t.textContent===expected) t.classList.add("glow"); });
+            setFeedback("再想想 🤔 发光的那个就是接下来要点的哦！", false);
+          } else {
+            setFeedback("不对哦，这个字母块不是接下来的一个，再试试！", false);
+          }
+        }
+      }
+
+      function wordComplete(){
+        var w = S.current;
+        S.wordsDone++;
+        if(S.mistakesThisWord===0) S.streak++; else S.streak = 0;
+        updateCombo();
+        if(S.learned.indexOf(w)===-1) S.learned.push(w);
+        S.sun += 10; $("hud-sun").textContent = S.sun;
+        sndWord(); speak(w.en);
+        var plant = summonPlant();
+        $("hud-sun").textContent = S.sun;
+        flySun();
+        setFeedback("🎉 太棒了！"+w.en+"（"+w.zh+"）拼对啦！召唤出「"+plant.name+"」！", true);
+        later(500, function(){ shootPea(); hitZombie(plant.dmg); });
+        later(1900, function(){ if(!S.over) nextWord(); });
+        S.current = null; /* 防止庆祝期间重复点 */
+      }
+
+      function setFeedback(msg, good){
+        var f = $("feedback");
+        f.textContent = msg;
+        f.className = "feedback " + (good ? "good" : "bad");
+      }
+
+      /* ---------------- 结算 ---------------- */
+      function gameOver(win){
+        if(S.over) return; S.over = true;
+        clearTimers();
+        try{ window.speechSynthesis && window.speechSynthesis.cancel(); }catch(e){}
+        if(win){
+          sndWin();
+          var stars = S.totalMistakes<=2 ? 3 : (S.totalMistakes<=6 ? 2 : 1);
+          $("result-emoji").textContent = "🏆";
+          $("result-title").textContent = "过关啦！打败了所有"+S.lv.zombieName+"！";
+          $("result-stars").textContent = "⭐".repeat(stars) + "☆".repeat(3-stars);
+          $("result-desc").innerHTML =
+            "这一关你拼对了 <b>"+S.wordsDone+"</b> 个单词，收集了 <b>"+S.sun+"</b> 个阳光 ☀️，用了 "+Math.floor(S.seconds/60)+" 分 "+(S.seconds%60)+" 秒。<br />点下面的单词卡片，还可以再听一听发音：";
+          $("btn-next").style.display = (S.idx < LEVELS.length-1) ? "" : "none";
+          speak("Great job!");
+        } else {
+          $("result-emoji").textContent = "🧟";
+          $("result-title").textContent = "僵尸进小房子啦，没关系！";
+          $("result-stars").textContent = "";
+          $("result-desc").innerHTML =
+            "你已经拼对了 <b>"+S.wordsDone+"</b> 个单词，打败了 <b>"+S.defeated+"</b> 只"+S.lv.zombieName+"，非常接近啦！<br />休息一下，再试一次一定可以保护小房子 🏠";
+          $("btn-next").style.display = "none";
+        }
+        var box = $("learned"); box.innerHTML="";
+        S.learned.forEach(function(w){
+          var c = document.createElement("button");
+          c.className = "word-chip";
+          c.innerHTML = '<span aria-hidden="true">'+w.pic+'</span><span class="en">'+w.en+'</span><span>'+w.zh+'</span><span aria-hidden="true">🔊</span>';
+          c.setAttribute("aria-label", "听发音 "+w.en);
+          c.addEventListener("click", function(){ speak(w.en); });
+          box.appendChild(c);
+        });
+        if(!S.learned.length) box.innerHTML = '<span class="word-chip">先拼对一个单词，这里就会出现你的单词卡片哦</span>';
+        show("screen-result");
+      }
+
+      /* ---------------- 全局按钮 ---------------- */
+      $("btn-back").addEventListener("click", function(){
+        clearTimers(); if(S) S.over = true;
+        try{ window.speechSynthesis && window.speechSynthesis.cancel(); }catch(e){}
+        show("screen-home");
+      });
+      $("btn-speak").addEventListener("click", function(){ if(S && S.current) speak(S.current.en); });
+      $("quiz-pic").addEventListener("click", function(){ if(S && S.current) speak(S.current.en); });
+      $("btn-sound").addEventListener("click", function(){
+        soundOn = !soundOn;
+        $("btn-sound").textContent = soundOn ? "🔊 音效" : "🔇 静音";
+        if(soundOn) sndGood();
+      });
+      $("btn-replay").addEventListener("click", function(){ startLevel(S.idx); });
+      $("btn-home").addEventListener("click", function(){ show("screen-home"); });
+      $("btn-next").addEventListener("click", function(){ startLevel(Math.min(S.idx+1, LEVELS.length-1)); });
+
+      buildHome();
+    })();
+    </script>
+  </body>
+</html>
